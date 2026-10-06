@@ -164,6 +164,22 @@
       pointer-events: none;
     }
 
+    #print-feed {
+      position: absolute;
+      z-index: 2;
+      left: var(--page-padding);
+      right: var(--page-padding);
+      height: var(--feed-height);
+      display: grid;
+      place-items: center;
+      border-top: 1px dashed #d8dfdb;
+      border-bottom: 1px dashed #d8dfdb;
+      background: rgba(233, 237, 235, .45);
+      color: #69756f;
+      font: 10px/1.4 Arial, sans-serif;
+      pointer-events: none;
+    }
+
     .page-break {
       position: absolute;
       z-index: 3;
@@ -229,6 +245,7 @@
 
       .toolbar,
       .hint,
+      #print-feed,
       .page-break {
         display: none !important;
       }
@@ -252,6 +269,11 @@
 
       #editor {
         min-height: 0 !important;
+        padding-bottom: var(--feed-height);
+      }
+
+      #editor:empty::before {
+        content: none;
       }
     }
   </style>
@@ -281,6 +303,7 @@
     <div class="paper-wrap">
       <article id="paper" aria-label="48 by 210 millimeter print page">
         <div id="editor" contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-placeholder="Type your note…"></div>
+        <div id="print-feed" aria-hidden="true">3 blank lines for tearing</div>
         <div id="breaks" aria-hidden="true"></div>
       </article>
     </div>
@@ -295,6 +318,7 @@
     const editor = document.getElementById('editor');
     const paper = document.getElementById('paper');
     const breaks = document.getElementById('breaks');
+    const printFeed = document.getElementById('print-feed');
     const sizeSelect = document.getElementById('font-size');
     const status = document.getElementById('status');
     let saveTimer;
@@ -302,14 +326,18 @@
     function contentHeight() {
       const previous = editor.style.minHeight;
       editor.style.minHeight = '0';
-      const height = editor.scrollHeight;
+      const height = editor.scrollHeight - parseFloat(getComputedStyle(editor).paddingBottom);
       editor.style.minHeight = previous;
       return height;
     }
 
     function updatePages() {
       const usablePagePx = (PAGE_HEIGHT_MM - PAGE_PADDING_MM) * PX_PER_MM;
-      const pages = Math.max(1, Math.ceil(contentHeight() / usablePagePx));
+      const feedHeight = parseFloat(getComputedStyle(editor).lineHeight) * 3;
+      paper.style.setProperty('--feed-height', `${feedHeight}px`);
+      const textHeight = contentHeight();
+      printFeed.style.top = `${(PAGE_PADDING_MM / 2) * PX_PER_MM + textHeight}px`;
+      const pages = Math.max(1, Math.ceil((textHeight + feedHeight) / usablePagePx));
       paper.style.height = `${pages * PAGE_HEIGHT_MM}mm`;
       editor.style.minHeight = `${(pages * PAGE_HEIGHT_MM) - PAGE_PADDING_MM}mm`;
       breaks.replaceChildren();
