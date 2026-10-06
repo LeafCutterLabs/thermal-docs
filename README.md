@@ -10,7 +10,7 @@ A minimal, browser-based note editor and print preview for a 48 mm printable are
 - Open-checkbox insertion
 - Left, center, and right alignment
 - Subtle on-screen page-break markers that are hidden when printing
-- Automatic three-line bottom allowance for tearing, shown lightly in the preview
+- Automatic three-line bottom allowance for tearing, ending in a thin printed line
 - Browser-local draft saving
 - Printing through the operating system's printer dialog
 

@@ -169,11 +169,11 @@
       z-index: 2;
       left: var(--page-padding);
       right: var(--page-padding);
-      height: var(--feed-height);
+      height: calc(var(--feed-height) + 1px);
       display: grid;
       place-items: center;
       border-top: 1px dashed #d8dfdb;
-      border-bottom: 1px dashed #d8dfdb;
+      border-bottom: 1px solid #000;
       background: rgba(233, 237, 235, .45);
       color: #69756f;
       font: 10px/1.4 Arial, sans-serif;
@@ -245,7 +245,7 @@
 
       .toolbar,
       .hint,
-      #print-feed,
+      #print-feed span,
       .page-break {
         display: none !important;
       }
@@ -269,7 +269,13 @@
 
       #editor {
         min-height: 0 !important;
-        padding-bottom: var(--feed-height);
+      }
+
+      #print-feed {
+        position: static;
+        display: block;
+        border-top: 0;
+        background: none;
       }
 
       #editor:empty::before {
@@ -303,7 +309,7 @@
     <div class="paper-wrap">
       <article id="paper" aria-label="48 by 210 millimeter print page">
         <div id="editor" contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-placeholder="Type your note…"></div>
-        <div id="print-feed" aria-hidden="true">3 blank lines for tearing</div>
+        <div id="print-feed" aria-hidden="true"><span>3 blank lines for tearing</span></div>
         <div id="breaks" aria-hidden="true"></div>
       </article>
     </div>
@@ -337,7 +343,7 @@
       paper.style.setProperty('--feed-height', `${feedHeight}px`);
       const textHeight = contentHeight();
       printFeed.style.top = `${(PAGE_PADDING_MM / 2) * PX_PER_MM + textHeight}px`;
-      const pages = Math.max(1, Math.ceil((textHeight + feedHeight) / usablePagePx));
+      const pages = Math.max(1, Math.ceil((textHeight + feedHeight + 1) / usablePagePx));
       paper.style.height = `${pages * PAGE_HEIGHT_MM}mm`;
       editor.style.minHeight = `${(pages * PAGE_HEIGHT_MM) - PAGE_PADDING_MM}mm`;
       breaks.replaceChildren();
