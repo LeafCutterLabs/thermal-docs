@@ -1,14 +1,15 @@
 # Thermal Docs
 
-A small, browser-based document editor and print preview for 58 mm and 80 mm thermal printers.
+A minimal, browser-based note editor and print preview for a 48 mm printable area on 58 mm thermal printers.
 
 ## Features
 
-- Optional title and plain-text document editor
-- Live thermal-paper preview
-- 58 mm or 80 mm paper widths
-- Adjustable font size, margins, and typeface
-- Open and save `.txt` files
+- Type directly on the thermal-paper preview
+- Fixed 48 × 210 mm printer pages with locked margins and Arial typeface
+- Adjustable text size
+- Open-checkbox insertion
+- Left, center, and right alignment
+- Subtle on-screen page-break markers that are hidden when printing
 - Browser-local draft saving
 - Printing through the operating system's printer dialog
 
@@ -17,4 +18,3 @@ For the POS-58 Windows driver, use 100% scale and disable browser headers and fo
 ## GitHub Pages
 
 The deployed site is built directly from [`dist/`](dist/) by the GitHub Pages workflow.
-

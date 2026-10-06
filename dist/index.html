@@ -1,13 +1,428 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Thermal Docs</title><meta name="description" content="Write and print simple documents on a thermal printer."><style>
-:root{font-family:Inter,Segoe UI,sans-serif;color:#202c35;background:#f3f5f4}*{box-sizing:border-box}body{margin:0}header{padding:26px 5vw;border-bottom:1px solid #dce3df;background:white;display:flex;align-items:center;justify-content:space-between}h1{font-size:22px;margin:0;letter-spacing:-.6px}.brand small{display:block;color:#6a7771;margin-top:5px}.badge{font-size:12px;color:#37634e;background:#edf5ee;padding:8px 12px;border-radius:20px}main{max-width:1160px;margin:35px auto;padding:0 25px;display:grid;grid-template-columns:1.15fr 1fr;gap:30px}.card{background:white;border:1px solid #dce3df;border-radius:16px;padding:26px}h2{font-size:18px;margin:0 0 20px}label{display:block;font-size:13px;font-weight:600;margin:17px 0 8px}input,select,textarea{font:inherit;border:1px solid #ccd6d0;border-radius:8px;padding:11px;width:100%;color:inherit;background:white}textarea{min-height:290px;resize:vertical;font-size:15px;line-height:1.6}.row{display:grid;grid-template-columns:1fr 1fr;gap:15px}button,.file-label{cursor:pointer;border:1px solid #ccd6d0;border-radius:8px;background:white;padding:11px 15px;font:inherit;font-size:13px;font-weight:600;margin:0}button:hover,.file-label:hover{background:#edf3ef}.primary{background:#235b43;color:white;border-color:#235b43;font-size:15px}.primary:hover{background:#174831}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}.note{font-size:12px;color:#69766f;line-height:1.7;margin-top:20px}.preview-panel{background:#e7ece8;border-radius:16px;padding:25px;min-height:500px}.preview-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#637269;margin-bottom:25px}.preview-top strong{font-size:14px;color:#34473b}#paper{width:58mm;margin:auto;background:white;box-shadow:0 5px 20px #29372a15;padding:5mm;color:black;overflow-wrap:anywhere;font-family:Arial,sans-serif;font-size:12px;line-height:1.4;min-height:120mm}#print-title{font-size:1.4em;line-height:1.25;margin:0 0 12px;font-weight:700}#print-body{white-space:pre-wrap}footer{text-align:center;color:#748078;font-size:12px;padding:15px 20px 30px}#status{font-size:12px;color:#53725e;margin-top:12px}input[type=file]{display:none}@media(max-width:760px){main{grid-template-columns:1fr;margin:20px auto;padding:0 14px}.card{padding:20px}header{padding:20px}.badge{display:none}}
-@media print{html,body{background:white!important;margin:0!important;padding:0!important}header,.card,.preview-top,footer{display:none!important}main{display:block!important;margin:0!important;padding:0!important;max-width:none!important}.preview-panel{background:white!important;padding:0!important;min-height:0!important}#paper{box-shadow:none!important;margin:0!important;min-height:0!important;width:var(--paper-width)!important;padding:var(--paper-margin)!important}#print-body{orphans:2;widows:2}}
-</style><style id="page-style">@page{size:58mm 160mm;margin:0}</style></head><body>
-<header><div class="brand"><h1>Thermal Docs</h1><small>A little paper. A clear message.</small></div><span class="badge">Ready for your thermal printer</span></header>
-<main><section class="card"><h2>Your document</h2><label for="title">Title (optional)</label><input id="title" placeholder="Shopping list, note, or checklist"><label for="body">Text</label><textarea id="body" placeholder="Type or paste your document here…"></textarea><div class="row"><div><label for="width">Paper width</label><select id="width"><option value="58">58 mm</option><option value="80">80 mm</option></select></div><div><label for="font">Text size</label><select id="font"><option value="10">Small · 10 px</option><option value="12" selected>Regular · 12 px</option><option value="14">Large · 14 px</option><option value="16">Extra large · 16 px</option></select></div></div><div class="row"><div><label for="margin">Side margins</label><select id="margin"><option value="5">5 mm (48 mm print area)</option><option value="3">3 mm</option><option value="0">No margins</option></select></div><div><label for="family">Typeface</label><select id="family"><option value="Arial, sans-serif">Clean</option><option value="Courier New, monospace">Monospace</option></select></div></div><div class="actions"><button class="primary" id="print">Print document</button><label class="file-label" for="file">Open .txt</label><input type="file" id="file" accept=".txt,text/plain"><button id="save">Save .txt</button><button id="clear">Clear</button></div><div id="status" role="status">Drafts save automatically in this browser.</div><p class="note">In the print dialog, choose your POS-58 printer, set scale to 100%, and turn off headers and footers. Match the driver paper width to the selection here. You can also choose “Save as PDF.” This editor accepts plain text; paste text from Word or a PDF.</p></section>
-<section class="preview-panel" aria-label="Document preview"><div class="preview-top"><strong>Print preview</strong><span id="dimensions">58 mm roll</span></div><article id="paper"><h2 id="print-title"></h2><div id="print-body"></div></article></section></main><footer>Text stays in your browser. Print through your installed Windows driver.</footer>
-<script>
-const ids=['title','body','width','font','margin','family'];const fields=Object.fromEntries(ids.map(id=>[id,document.getElementById(id)]));const paper=document.getElementById('paper');let restoring=false;
-function render(){const w=Number(fields.width.value),m=Number(fields.margin.value);paper.style.width=w+'mm';paper.style.padding=m+'mm';paper.style.fontSize=fields.font.value+'px';paper.style.fontFamily=fields.family.value;paper.style.setProperty('--paper-width',w+'mm');paper.style.setProperty('--paper-margin',m+'mm');document.getElementById('print-title').textContent=fields.title.value;document.getElementById('print-title').hidden=!fields.title.value;document.getElementById('print-body').textContent=fields.body.value;document.getElementById('dimensions').textContent=w+' mm roll';const height=Math.max(40,Math.ceil(paper.scrollHeight*25.4/96)+8);document.getElementById('page-style').textContent='@page{size:'+w+'mm '+height+'mm;margin:0}';if(!restoring){try{localStorage.setItem('thermal-docs',JSON.stringify(Object.fromEntries(ids.map(id=>[id,fields[id].value]))));}catch{document.getElementById('status').textContent='Automatic saving is unavailable in this browser.'}}}
-try{const draft=JSON.parse(localStorage.getItem('thermal-docs')||'null');if(draft){restoring=true;ids.forEach(id=>{if(typeof draft[id]==='string')fields[id].value=draft[id]});}}catch{}restoring=false;ids.forEach(id=>fields[id].addEventListener('input',render));render();document.getElementById('print').onclick=()=>{render();window.print()};document.getElementById('clear').onclick=()=>{fields.title.value='';fields.body.value='';render();fields.body.focus()};document.getElementById('file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{fields.body.value=await file.text();fields.title.value=file.name.replace(/\.txt$/i,'');render();document.getElementById('status').textContent='Opened '+file.name;}catch{document.getElementById('status').textContent='Could not open this file.'}e.target.value=''};document.getElementById('save').onclick=()=>{const content=(fields.title.value?fields.title.value+'\n\n':'')+fields.body.value;const url=URL.createObjectURL(new Blob([content],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download=(fields.title.value||'document').replace(/[^a-z0-9 _-]/gi,'').slice(0,80)+'.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
-</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thermal Docs</title>
+  <meta name="description" content="A minimal editor for 48 mm thermal-printer pages.">
+  <style>
+    :root {
+      --page-width: 48mm;
+      --page-height: 210mm;
+      --page-padding: 3.5mm;
+      --ink: #18221d;
+      --muted: #69756f;
+      --line: #d8dfdb;
+      --canvas: #e9edeb;
+      font-family: Arial, sans-serif;
+      color: var(--ink);
+      background: var(--canvas);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--canvas);
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 58px;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(249, 250, 249, .96);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      margin-right: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -.2px;
+      white-space: nowrap;
+    }
+
+    .tool,
+    .size-select {
+      height: 38px;
+      border: 1px solid #cbd4cf;
+      border-radius: 9px;
+      background: #fff;
+      color: var(--ink);
+      font: 600 14px/1 Arial, sans-serif;
+    }
+
+    .tool {
+      display: inline-grid;
+      min-width: 38px;
+      padding: 0 10px;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .tool:hover,
+    .tool:focus-visible,
+    .size-select:hover,
+    .size-select:focus-visible {
+      border-color: #809087;
+      outline: none;
+    }
+
+    .tool[aria-pressed="true"] {
+      border-color: #203e30;
+      background: #e6eee9;
+    }
+
+    .size-select {
+      width: 76px;
+      padding: 0 8px;
+      cursor: pointer;
+    }
+
+    .print {
+      margin-left: 3px;
+      border-color: #203e30;
+      background: #203e30;
+      color: #fff;
+    }
+
+    .print:hover,
+    .print:focus-visible {
+      border-color: #10281d;
+      background: #10281d;
+    }
+
+    .align-glyph {
+      display: flex;
+      width: 16px;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .align-glyph i {
+      display: block;
+      width: 16px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    .align-glyph i:nth-child(2) { width: 10px; }
+    .align-glyph i:nth-child(3) { width: 13px; }
+    .align-left { align-items: flex-start; }
+    .align-center { align-items: center; }
+    .align-right { align-items: flex-end; }
+
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100vh - 58px);
+      padding: 28px 16px 64px;
+    }
+
+    .paper-wrap {
+      position: relative;
+    }
+
+    #paper {
+      position: relative;
+      width: var(--page-width);
+      min-height: var(--page-height);
+      padding: var(--page-padding);
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 7px 24px rgba(22, 35, 28, .16);
+    }
+
+    #editor {
+      position: relative;
+      z-index: 1;
+      min-height: calc(var(--page-height) - (2 * var(--page-padding)));
+      border: 0;
+      outline: 0;
+      color: #000;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.38;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+      caret-color: #000;
+    }
+
+    #editor:empty::before {
+      color: #a0a8a3;
+      content: attr(data-placeholder);
+      pointer-events: none;
+    }
+
+    .page-break {
+      position: absolute;
+      z-index: 3;
+      right: 0;
+      left: 0;
+      height: 0;
+      border-top: 1px dashed #aab5af;
+      pointer-events: none;
+    }
+
+    .page-break span {
+      position: absolute;
+      top: -10px;
+      left: calc(100% + 10px);
+      width: max-content;
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: var(--canvas);
+      color: var(--muted);
+      font: 10px/1.4 Arial, sans-serif;
+    }
+
+    .hint {
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 430px) {
+      .toolbar { gap: 4px; padding-inline: 8px; }
+      .brand { display: none; }
+      .tool { min-width: 36px; padding-inline: 8px; }
+      .page-break span { display: none; }
+    }
+
+    @page {
+      size: 48mm 210mm;
+      margin: 0;
+    }
+
+    @media print {
+      html,
+      body {
+        width: 48mm;
+        min-height: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+      }
+
+      .toolbar,
+      .hint,
+      .page-break {
+        display: none !important;
+      }
+
+      .workspace {
+        display: block;
+        min-height: 0;
+        padding: 0;
+        background: #fff;
+      }
+
+      #paper {
+        width: 48mm;
+        height: auto !important;
+        min-height: 0;
+        margin: 0;
+        padding: var(--page-padding);
+        overflow: visible;
+        box-shadow: none;
+      }
+
+      #editor {
+        min-height: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="toolbar" aria-label="Text tools">
+    <span class="brand">Thermal Docs</span>
+
+    <label class="sr-only" for="font-size">Text size</label>
+    <select class="size-select" id="font-size" title="Text size">
+      <option value="10">10 px</option>
+      <option value="12" selected>12 px</option>
+      <option value="14">14 px</option>
+      <option value="16">16 px</option>
+      <option value="18">18 px</option>
+      <option value="20">20 px</option>
+    </select>
+
+    <button class="tool" id="checkbox" type="button" title="Insert open checkbox" aria-label="Insert open checkbox">☐</button>
+    <button class="tool align" type="button" data-command="justifyLeft" title="Align left" aria-label="Align left"><span class="align-glyph align-left" aria-hidden="true"><i></i><i></i><i></i></span></button>
+    <button class="tool align" type="button" data-command="justifyCenter" title="Align center" aria-label="Align center"><span class="align-glyph align-center" aria-hidden="true"><i></i><i></i><i></i></span></button>
+    <button class="tool align" type="button" data-command="justifyRight" title="Align right" aria-label="Align right"><span class="align-glyph align-right" aria-hidden="true"><i></i><i></i><i></i></span></button>
+    <button class="tool print" id="print" type="button">Print</button>
+  </header>
+
+  <main class="workspace">
+    <div class="paper-wrap">
+      <article id="paper" aria-label="48 by 210 millimeter print page">
+        <div id="editor" contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-placeholder="Type your note…"></div>
+        <div id="breaks" aria-hidden="true"></div>
+      </article>
+    </div>
+    <p class="hint" id="status">48 × 210 mm · Arial · fixed margins · saved in this browser</p>
+  </main>
+
+  <script>
+    const PAGE_HEIGHT_MM = 210;
+    const PAGE_PADDING_MM = 7;
+    const PX_PER_MM = 96 / 25.4;
+    const STORAGE_KEY = 'thermal-docs-minimal-v1';
+    const editor = document.getElementById('editor');
+    const paper = document.getElementById('paper');
+    const breaks = document.getElementById('breaks');
+    const sizeSelect = document.getElementById('font-size');
+    const status = document.getElementById('status');
+    let saveTimer;
+
+    function contentHeight() {
+      const previous = editor.style.minHeight;
+      editor.style.minHeight = '0';
+      const height = editor.scrollHeight;
+      editor.style.minHeight = previous;
+      return height;
+    }
+
+    function updatePages() {
+      const usablePagePx = (PAGE_HEIGHT_MM - PAGE_PADDING_MM) * PX_PER_MM;
+      const pages = Math.max(1, Math.ceil(contentHeight() / usablePagePx));
+      paper.style.height = `${pages * PAGE_HEIGHT_MM}mm`;
+      editor.style.minHeight = `${(pages * PAGE_HEIGHT_MM) - PAGE_PADDING_MM}mm`;
+      breaks.replaceChildren();
+
+      for (let page = 1; page < pages; page += 1) {
+        const marker = document.createElement('div');
+        marker.className = 'page-break';
+        marker.style.top = `${page * PAGE_HEIGHT_MM}mm`;
+        marker.innerHTML = `<span>Page ${page + 1}</span>`;
+        breaks.append(marker);
+      }
+
+      status.textContent = `48 × 210 mm · ${pages} ${pages === 1 ? 'page' : 'pages'} · saved in this browser`;
+    }
+
+    function saveDraft() {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            html: editor.innerHTML,
+            fontSize: sizeSelect.value
+          }));
+        } catch {
+          status.textContent = 'This browser could not save the draft.';
+        }
+      }, 120);
+    }
+
+    function changed() {
+      updatePages();
+      saveDraft();
+    }
+
+    function putCaretAtEnd() {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      range.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+
+    function focusEditor() {
+      if (!editor.contains(window.getSelection()?.anchorNode)) {
+        editor.focus();
+        putCaretAtEnd();
+      }
+    }
+
+    function restoreDraft() {
+      try {
+        const draft = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (draft && typeof draft.html === 'string') editor.innerHTML = draft.html;
+        if (draft && ['10', '12', '14', '16', '18', '20'].includes(draft.fontSize)) {
+          sizeSelect.value = draft.fontSize;
+        }
+
+        if (!draft) {
+          const oldDraft = JSON.parse(localStorage.getItem('thermal-docs') || 'null');
+          if (oldDraft && typeof oldDraft.body === 'string') {
+            editor.textContent = `${oldDraft.title ? `${oldDraft.title}\n\n` : ''}${oldDraft.body}`;
+            if (['10', '12', '14', '16'].includes(oldDraft.font)) sizeSelect.value = oldDraft.font;
+          }
+        }
+      } catch {}
+
+      editor.style.fontSize = `${sizeSelect.value}px`;
+      updatePages();
+    }
+
+    editor.addEventListener('input', changed);
+    editor.addEventListener('paste', event => {
+      event.preventDefault();
+      document.execCommand('insertText', false, event.clipboardData.getData('text/plain'));
+    });
+
+    sizeSelect.addEventListener('change', () => {
+      editor.style.fontSize = `${sizeSelect.value}px`;
+      changed();
+      editor.focus();
+    });
+
+    document.getElementById('checkbox').addEventListener('mousedown', event => event.preventDefault());
+    document.getElementById('checkbox').addEventListener('click', () => {
+      focusEditor();
+      document.execCommand('insertText', false, '☐ ');
+      changed();
+    });
+
+    document.querySelectorAll('[data-command]').forEach(button => {
+      button.addEventListener('mousedown', event => event.preventDefault());
+      button.addEventListener('click', () => {
+        focusEditor();
+        document.execCommand(button.dataset.command, false, null);
+        changed();
+      });
+    });
+
+    document.addEventListener('selectionchange', () => {
+      if (!editor.contains(window.getSelection()?.anchorNode)) return;
+      document.querySelectorAll('[data-command]').forEach(button => {
+        button.setAttribute('aria-pressed', String(document.queryCommandState(button.dataset.command)));
+      });
+    });
+
+    document.getElementById('print').addEventListener('click', () => {
+      updatePages();
+      window.print();
+    });
+
+    window.addEventListener('resize', updatePages);
+    restoreDraft();
+  </script>
+</body>
+</html>
